@@ -57,6 +57,7 @@ namespace FrenzelWPFApp
             frameRateTimer.Tick += FrameRateTimer_Tick;
             frameRateTimer.Start();
             Loaded += MainWindow_Loaded;
+            btnEndDiagnosis.IsEnabled = false;
         }
 
 
@@ -250,32 +251,42 @@ namespace FrenzelWPFApp
         {
             try
             {
-                if (isRecording)
-                {
-                    // Kaydı durdurma işlemleri
-                    isRecording = false;
-                    btnStartDiagnosis.Content = "Start Diagnosis";
-                    videoWriter.Dispose();
-                    imageSequenceMats.Clear();
-                    Debug.WriteLine("number of frames = " + numofframes);
-                    Debug.WriteLine("number of frames left= " + numofframesleft);
-                    Debug.WriteLine("number of frames right= " + numofframesright);
-                    recordingStopwatch.Stop();
-                    TimeSpan recordingDuration = recordingStopwatch.Elapsed;
-                    Debug.WriteLine($"Recording duration: {recordingDuration}");
-                }
-                else
-                {
-                    // Kaydı başlatma
-                    videoWriter = new VideoWriter(outputFileName, backend_idx, codec1, 10, new System.Drawing.Size(1280, 480), true);
-                    isRecording = true;
-                    btnStartDiagnosis.Content = "End Diagnosis";
-                    recordingStopwatch.Reset();
-                    recordingStopwatch.Start();
-                    numofframes = 0;
-                    numofframesleft = 0;
-                    numofframesright = 0;
-                }
+                btnStartDiagnosis.IsEnabled = false;
+               
+                // Kaydı başlatma
+                videoWriter = new VideoWriter(outputFileName, backend_idx, codec1, 10, new System.Drawing.Size(1280, 480), true);
+                isRecording = true;
+                recordingStopwatch.Reset();
+                recordingStopwatch.Start();
+                numofframes = 0;
+                numofframesleft = 0;
+                numofframesright = 0;
+                btnEndDiagnosis.IsEnabled = true;
+
+            }
+            catch (Exception)
+            {
+
+                throw;
+            }
+        }
+        private void EndDiagnosis_Click(object sender, RoutedEventArgs e)
+        {
+            try
+            {
+                btnEndDiagnosis.IsEnabled = false;
+                // Kaydı durdurma işlemleri
+                isRecording = false;
+                videoWriter.Dispose();
+                imageSequenceMats.Clear();
+                Debug.WriteLine("number of frames = " + numofframes);
+                Debug.WriteLine("number of frames left= " + numofframesleft);
+                Debug.WriteLine("number of frames right= " + numofframesright);
+                recordingStopwatch.Stop();
+                TimeSpan recordingDuration = recordingStopwatch.Elapsed;
+                Debug.WriteLine($"Recording duration: {recordingDuration}");
+                btnStartDiagnosis.IsEnabled = true;
+                
             }
             catch (Exception)
             {

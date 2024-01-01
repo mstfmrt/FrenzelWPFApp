@@ -1,11 +1,11 @@
 ﻿<Window x:Class="FrenzelWPFApp.MainWindow"
         xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
-        Title="Video Frenzel Uygulaması" Height="500" Width="800">
+        Title="FrenzelApp" WindowState="Maximized">
     <Grid>
-        <StackPanel Orientation="Vertical">
+        <StackPanel Orientation="Vertical" Height="Auto" VerticalAlignment="Top">
             <!-- Üst kısım: Webcam görüntüleri -->
-            <Viewbox>
+            <Viewbox Height="Auto">
                 <StackPanel Orientation="Horizontal" Margin="10">
                     <Image Name="leftEyeImage" Width="Auto" Height="Auto"/>
                     <Image Name="rightEyeImage" Width="Auto" Height="Auto"/>
@@ -15,30 +15,31 @@
             <!-- Orta kısım: Hastanın bilgileri -->
             <StackPanel Margin="10">
                 <TextBlock Text="Hasta Bilgileri" FontWeight="Bold" FontSize="16" Margin="0,0,0,10"/>
-                <StackPanel Orientation="Horizontal" Margin="0,0,0,5">
-                    <TextBlock Text="Kimlik Numarası:" Margin="0,0,10,0"/>
-                    <TextBox Name="txtIdentityNumber" Width="150"/>
-                    <Button Content="Ara" Click="SearchPatient_Click" Margin="10,0,0,0"/>
-                </StackPanel>
-                <StackPanel Orientation="Horizontal" Margin="0,0,0,5">
-                    <TextBlock Text="Ad:" Margin="0,0,10,0"/>
-                    <TextBox Name="txtFirstName" Width="150"/>
-                </StackPanel>
-                <StackPanel Orientation="Horizontal" Margin="0,0,0,5">
-                    <TextBlock Text="Soyad:" Margin="0,0,10,0"/>
-                    <TextBox Name="txtLastName" Width="150"/>
-                </StackPanel>
-                <StackPanel Orientation="Horizontal" Margin="0,0,0,5">
-                    <TextBlock Text="Doğum Tarihi:" Margin="0,0,10,0"/>
-                    <DatePicker Name="dpBirthDate" Width="150"/>
+                <StackPanel Orientation="Horizontal">
+                    <StackPanel>
+                            <TextBlock Text="Kimlik Numarası:" Margin="0,0,10,8"/>
+                        <TextBlock Text="Ad:" Margin="0,0,10,8"/>
+                            <TextBlock Text="Soyad:" Margin="0,0,10,8"/>
+                            <TextBlock Text="Doğum Tarihi:" Margin="0,0,10,8"/>
+                        
+                    </StackPanel>
+                    <StackPanel Margin="30,0,0,0">
+                        <TextBox Name="txtIdentityNumber" Width="150" Margin="0,0,0,5"/>
+                        <TextBox x:Name="txtFirstName" Width="150" Margin="0,0,0,5"/>
+                        <TextBox Name="txtLastName" Width="150" Margin="0,0,0,5"/>
+                        <DatePicker Name="dpBirthDate" Width="150" Margin="0,0,0,5"/>
+
+                    </StackPanel>
+                    <StackPanel Margin="20">
+                        <Button Name="btnStartDiagnosis" Content="Start Diagnosis" Click="StartDiagnosis_Click" Height="30" Margin="5"/>
+                        <Button Name="btnEndDiagnosis" Content="End Diagnosis" Click="EndDiagnosis_Click" Height="30" Margin="5"/>
+                    </StackPanel>
                 </StackPanel>
                 <!-- Diğer hastane bilgileri ekleyebilirsiniz -->
             </StackPanel>
 
             <!-- Alt kısım: Video kaydı -->
-            <StackPanel Margin="10">
-                <Button Name="btnStartDiagnosis" Content="Start Diagnosis" Click="StartDiagnosis_Click"/>
-            </StackPanel>
+            
         </StackPanel>
     </Grid>
 </Window>
