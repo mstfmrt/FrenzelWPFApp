@@ -1,0 +1,44 @@
+﻿<Window x:Class="FrenzelWPFApp.MainWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        Title="Video Frenzel Uygulaması" Height="500" Width="800">
+    <Grid>
+        <StackPanel Orientation="Vertical">
+            <!-- Üst kısım: Webcam görüntüleri -->
+            <Viewbox>
+                <StackPanel Orientation="Horizontal" Margin="10">
+                    <Image Name="leftEyeImage" Width="Auto" Height="Auto"/>
+                    <Image Name="rightEyeImage" Width="Auto" Height="Auto"/>
+                </StackPanel>
+            </Viewbox>
+
+            <!-- Orta kısım: Hastanın bilgileri -->
+            <StackPanel Margin="10">
+                <TextBlock Text="Hasta Bilgileri" FontWeight="Bold" FontSize="16" Margin="0,0,0,10"/>
+                <StackPanel Orientation="Horizontal" Margin="0,0,0,5">
+                    <TextBlock Text="Kimlik Numarası:" Margin="0,0,10,0"/>
+                    <TextBox Name="txtIdentityNumber" Width="150"/>
+                    <Button Content="Ara" Click="SearchPatient_Click" Margin="10,0,0,0"/>
+                </StackPanel>
+                <StackPanel Orientation="Horizontal" Margin="0,0,0,5">
+                    <TextBlock Text="Ad:" Margin="0,0,10,0"/>
+                    <TextBox Name="txtFirstName" Width="150"/>
+                </StackPanel>
+                <StackPanel Orientation="Horizontal" Margin="0,0,0,5">
+                    <TextBlock Text="Soyad:" Margin="0,0,10,0"/>
+                    <TextBox Name="txtLastName" Width="150"/>
+                </StackPanel>
+                <StackPanel Orientation="Horizontal" Margin="0,0,0,5">
+                    <TextBlock Text="Doğum Tarihi:" Margin="0,0,10,0"/>
+                    <DatePicker Name="dpBirthDate" Width="150"/>
+                </StackPanel>
+                <!-- Diğer hastane bilgileri ekleyebilirsiniz -->
+            </StackPanel>
+
+            <!-- Alt kısım: Video kaydı -->
+            <StackPanel Margin="10">
+                <Button Name="btnStartDiagnosis" Content="Start Diagnosis" Click="StartDiagnosis_Click"/>
+            </StackPanel>
+        </StackPanel>
+    </Grid>
+</Window>
