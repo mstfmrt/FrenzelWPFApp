@@ -11,12 +11,17 @@ using AForge.Video.DirectShow;
 using Emgu.CV;
 using Emgu.CV.Structure;
 using System.Diagnostics;
+using Emgu.CV.Dai;
+using System.Linq;
 
 namespace FrenzelWPFApp
 {
     public partial class MainWindow : Window
     {
         private FilterInfoCollection videoDevices;
+        private int leftVideoDeviceIdx = 0;
+        private int rightVideoDeviceIdx = 0;
+
         private VideoCaptureDevice leftVideoSource;
         private VideoCaptureDevice rightVideoSource;
         private int actualFrameRate;
@@ -32,6 +37,9 @@ namespace FrenzelWPFApp
         public int numofframesleft = 0;
         private DispatcherTimer frameRateTimer;
 
+        private bool isCamerasChanged = false;
+
+        string outputDirectory = @"C:\Users\Mustafa\Desktop\FrenzelRecords\";
 
         #region Parameters
 
@@ -41,7 +49,7 @@ namespace FrenzelWPFApp
 
         List<Mat> imageSequenceMats = new List<Mat>();
 
-        string outputFileName = @"C:\Users\Mustafa\Desktop\output.mp4";
+        
 
 
         #endregion
@@ -80,7 +88,7 @@ namespace FrenzelWPFApp
         {
             Backend[] backends = CvInvoke.WriterBackends;
 
-            videoWriter = new VideoWriter(outputFileName, backend_idx, codec1, 25, new System.Drawing.Size(640, 480), false);
+            //videoWriter = new VideoWriter(outputFileName, backend_idx, codec1, 25, new System.Drawing.Size(640, 480), false);
         }
         private void MainWindow_Loaded(object sender, RoutedEventArgs e)
         {
@@ -88,15 +96,37 @@ namespace FrenzelWPFApp
             videoDevices = new FilterInfoCollection(FilterCategory.VideoInputDevice);
             if (videoDevices.Count >= 2)
             {
-                leftVideoSource = new VideoCaptureDevice(videoDevices[3].MonikerString);
-                rightVideoSource = new VideoCaptureDevice(videoDevices[4].MonikerString);
-                leftVideoSource.NewFrame += LeftVideoSource_NewFrame;
-                rightVideoSource.NewFrame += RightVideoSource_NewFrame;
+                for (int i = 0; i < videoDevices.Count ; i++)
+                {
+                    if (videoDevices[i].Name.Contains("Integrated Camera"))
+                    {
+                        leftVideoDeviceIdx = i;
+                        for (i = i+1; i < videoDevices.Count; i++)
+                        {
+                            if (videoDevices[i].Name.Contains("Integrated Camera"))
+                            {
+                                rightVideoDeviceIdx = i;
 
-                leftVideoSource.Start();
-                rightVideoSource.Start();
+                            }
+                        }
+                        break;
+                    }
+                }
 
-                actualFrameRate = (int)leftVideoSource.VideoCapabilities[0].AverageFrameRate;
+                if(leftVideoDeviceIdx != 0 && rightVideoDeviceIdx != 0)
+                {
+                    leftVideoSource = new VideoCaptureDevice(videoDevices[leftVideoDeviceIdx].MonikerString);
+                    rightVideoSource = new VideoCaptureDevice(videoDevices[rightVideoDeviceIdx].MonikerString);
+                    leftVideoSource.NewFrame += LeftVideoSource_NewFrame;
+                    rightVideoSource.NewFrame += RightVideoSource_NewFrame;
+
+                    leftVideoSource.Start();
+                    rightVideoSource.Start();
+                }
+                else
+                {
+                    MessageBox.Show("Frenzel Gözlük bulunamadı lütfen bağlantıları kontrol ediniz.");
+                }
             }
             else
             {
@@ -154,6 +184,26 @@ namespace FrenzelWPFApp
                     numofframesright++;
                 }
             });
+        }
+
+        private void ChangeCameras_Click(object sender, RoutedEventArgs e)
+        {
+            if (isCamerasChanged)
+            {
+                isCamerasChanged = false;
+                leftVideoSource.NewFrame -= RightVideoSource_NewFrame; 
+                rightVideoSource.NewFrame -= LeftVideoSource_NewFrame;
+                leftVideoSource.NewFrame += LeftVideoSource_NewFrame;
+                rightVideoSource.NewFrame += RightVideoSource_NewFrame; 
+            }
+            else
+            {
+                isCamerasChanged = true;
+                leftVideoSource.NewFrame -= LeftVideoSource_NewFrame;
+                rightVideoSource.NewFrame -= RightVideoSource_NewFrame;
+                leftVideoSource.NewFrame += RightVideoSource_NewFrame;
+                rightVideoSource.NewFrame += LeftVideoSource_NewFrame;
+            }
         }
 
         private BitmapImage ConvertToBitmapImage(System.Drawing.Bitmap bitmap)
@@ -243,26 +293,51 @@ namespace FrenzelWPFApp
 
         private void SearchPatient_Click(object sender, RoutedEventArgs e)
         {
-            // Hasta arama işlemleri
-            // Buraya hastanın kimlik numarasına göre arama kodunu ekleyebilirsiniz
+            string filePrefix = txtIdentityNumber.Text;
+
+            if (filePrefix.Length > 0)
+            {
+                string matchingFile = Directory.GetFiles(outputDirectory)
+                                                  .FirstOrDefault(file => Path.GetFileName(file).StartsWith(filePrefix));
+
+                if (matchingFile != null)
+                {
+                    var patientinfo = matchingFile.Split('_');
+                    txtLastName.Text = patientinfo[1];
+                    txtFirstName.Text = patientinfo[2];
+                    dpBirthDate.Text = patientinfo[3];
+
+                    return;
+                }
+            }
+            MessageBox.Show("Kayıt Bulunamadı!");
+            
         }
 
         private void StartDiagnosis_Click(object sender, RoutedEventArgs e)
         {
             try
             {
-                btnStartDiagnosis.IsEnabled = false;
-               
-                // Kaydı başlatma
-                videoWriter = new VideoWriter(outputFileName, backend_idx, codec1, 10, new System.Drawing.Size(1280, 480), true);
-                isRecording = true;
-                recordingStopwatch.Reset();
-                recordingStopwatch.Start();
-                numofframes = 0;
-                numofframesleft = 0;
-                numofframesright = 0;
-                btnEndDiagnosis.IsEnabled = true;
+                
 
+                if(txtIdentityNumber.Text.Length > 0 && txtFirstName.Text.Length > 0 && txtLastName.Text.Length > 0 && dpBirthDate.Text.Length > 0) 
+                {
+                    btnStartDiagnosis.IsEnabled = false;
+                    string filePath = outputDirectory + txtIdentityNumber.Text + '_' + txtLastName.Text + '_' + txtFirstName.Text + '_' + dpBirthDate.Text + '_' + DateTime.Now.ToString("dd.MM.yyyy_HH.mm.ss.fff") + ".mp4";
+                    // Kaydı başlatma
+                    videoWriter = new VideoWriter(filePath, backend_idx, codec1, 10, new System.Drawing.Size(1280, 480), true);
+                    isRecording = true;
+                    recordingStopwatch.Reset();
+                    recordingStopwatch.Start();
+                    numofframes = 0;
+                    numofframesleft = 0;
+                    numofframesright = 0;
+                    btnEndDiagnosis.IsEnabled = true;
+                }
+                else
+                {
+                    MessageBox.Show("Lütfen hasta bilgilerini giriniz.");
+                }
             }
             catch (Exception)
             {
