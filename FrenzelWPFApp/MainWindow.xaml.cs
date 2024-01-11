@@ -3,7 +3,6 @@ using System.Collections.Generic;
 using System.IO;
 using System.Windows;
 using System.Drawing;
-using System.Windows.Documents;
 using System.Windows.Media.Imaging;
 using System.Windows.Threading;
 using AForge.Video;
@@ -13,6 +12,7 @@ using Emgu.CV.Structure;
 using System.Diagnostics;
 using Emgu.CV.Dai;
 using System.Linq;
+using System.Windows.Input;
 
 namespace FrenzelWPFApp
 {
@@ -49,7 +49,7 @@ namespace FrenzelWPFApp
 
         List<Mat> imageSequenceMats = new List<Mat>();
 
-        
+
 
 
         #endregion
@@ -297,15 +297,27 @@ namespace FrenzelWPFApp
 
             if (filePrefix.Length > 0)
             {
-                string matchingFile = Directory.GetFiles(outputDirectory)
+                string[] matchingFiles = Directory.GetFiles(outputDirectory)
                 .Where(file => Path.GetFileName(file).StartsWith(filePrefix))
+                .ToArray();
 
-                if (matchingFile != null)
+                if (matchingFiles != null && matchingFiles.Length > 0)
                 {
-                    var patientinfo = matchingFile.Split('_');
-                    txtLastName.Text = patientinfo[1];
-                    txtFirstName.Text = patientinfo[2];
-                    dpBirthDate.Text = patientinfo[3];
+                    string firstId = Path.GetFileNameWithoutExtension(matchingFiles[0]).Substring(0,11);
+
+
+                    if (matchingFiles.All(file => Path.GetFileName(file).StartsWith(firstId)))
+                    {
+                        var patientinfo = Path.GetFileNameWithoutExtension(matchingFiles[0]).Split('_');
+                        txtIdentityNumber.Text = patientinfo[0];
+                        txtLastName.Text = patientinfo[1];
+                        txtFirstName.Text = patientinfo[2];
+                        dpBirthDate.Text = patientinfo[3];
+                        return;
+                    }
+
+
+                    MessageBox.Show("Birden çok eşleşme bulundu! Lütfen daha çok karakter giriniz.");
 
                     return;
                 }
@@ -372,12 +384,25 @@ namespace FrenzelWPFApp
 
         private void Window_Closed(object sender, EventArgs e)
         {
-            // Uygulama kapatıldığında video kaynaklarını serbest bırak
-            if (leftVideoSource != null && leftVideoSource.IsRunning)
-                leftVideoSource.Stop();
+            Environment.Exit(0);
+        }
 
-            if (rightVideoSource != null && rightVideoSource.IsRunning)
-                rightVideoSource.Stop();
+        private void Window_Minimize(object sender, EventArgs e)
+        {
+            this.WindowState = WindowState.Minimized;
+        }
+
+        private void Window_Maximize(object sender, EventArgs e)
+        {
+            if(this.WindowState == WindowState.Maximized)
+                this.WindowState = WindowState.Normal;
+            else
+                this.WindowState = WindowState.Maximized;
+        }
+        private void Window_MouseDown(object sender, MouseButtonEventArgs e)
+        {
+            if (e.ChangedButton == MouseButton.Left)
+                DragMove();
         }
     }
 }
