@@ -39,7 +39,7 @@ namespace FrenzelWPFApp
 
         private bool isCamerasChanged = false;
 
-        string outputDirectory = @"C:\Users\Mustafa\Desktop\FrenzelRecords\";
+        string outputDirectory = Directory.GetCurrentDirectory() + @"\FrenzelRecords\";
 
         #region Parameters
 
@@ -58,6 +58,10 @@ namespace FrenzelWPFApp
 
         public MainWindow()
         {
+            if (!System.IO.Directory.Exists(outputDirectory))
+            {
+                System.IO.Directory.CreateDirectory(outputDirectory);
+            }
             InitializeComponent();
             //InitializeVariables();
             frameRateTimer = new DispatcherTimer();
@@ -78,8 +82,8 @@ namespace FrenzelWPFApp
             Debug.WriteLine("");
             Debug.WriteLine("");
             // Reset frame counts
-            leftFrameCount = 0;
-            rightFrameCount = 0;
+            leftFrameCount = -1;
+            rightFrameCount = -1;
             frameCountStopwatch.Restart();
         }
 
@@ -113,7 +117,7 @@ namespace FrenzelWPFApp
                     }
                 }
 
-                if(leftVideoDeviceIdx != 0 && rightVideoDeviceIdx != 0)
+                if(leftVideoDeviceIdx != -1 && rightVideoDeviceIdx != -1)
                 {
                     leftVideoSource = new VideoCaptureDevice(videoDevices[leftVideoDeviceIdx].MonikerString);
                     rightVideoSource = new VideoCaptureDevice(videoDevices[rightVideoDeviceIdx].MonikerString);
@@ -382,6 +386,10 @@ namespace FrenzelWPFApp
             }
         }
 
+        private void OpenRecords_Click(object sender, EventArgs e)
+        {
+            System.Diagnostics.Process.Start("explorer.exe", outputDirectory);
+        }
         private void Window_Closed(object sender, EventArgs e)
         {
             Environment.Exit(0);
