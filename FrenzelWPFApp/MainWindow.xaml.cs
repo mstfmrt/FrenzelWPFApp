@@ -298,7 +298,7 @@ namespace FrenzelWPFApp
             if (filePrefix.Length > 0)
             {
                 string matchingFile = Directory.GetFiles(outputDirectory)
-                                                  .FirstOrDefault(file => Path.GetFileName(file).StartsWith(filePrefix));
+                .Where(file => Path.GetFileName(file).StartsWith(filePrefix))
 
                 if (matchingFile != null)
                 {

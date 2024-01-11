@@ -12,7 +12,6 @@
             </Menu>
             <Viewbox Height="Auto">
                 <StackPanel Orientation="Horizontal" Margin="10">
-                    <Image Name="leftEyeImage" Width="Auto" Height="Auto" Margin="10"/>
                     <Image Name="rightEyeImage" Width="Auto" Height="Auto" Margin="10"/>
                 </StackPanel>
             </Viewbox>
