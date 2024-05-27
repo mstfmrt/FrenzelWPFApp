@@ -13,6 +13,7 @@ using System.Diagnostics;
 using Emgu.CV.Dai;
 using System.Linq;
 using System.Windows.Input;
+using System.Windows.Controls;
 
 namespace FrenzelWPFApp
 {
@@ -329,6 +330,15 @@ namespace FrenzelWPFApp
             MessageBox.Show("Kayıt Bulunamadı!");
             
         }
+        private void ClearPatient_Click(object sender, RoutedEventArgs e)
+        {
+            txtIdentityNumber.Text = string.Empty;
+            txtLastName.Text = string.Empty;
+            txtFirstName.Text = string.Empty;
+            dpBirthDate.Text = string.Empty;
+            return;
+
+        }
 
         private void StartDiagnosis_Click(object sender, RoutedEventArgs e)
         {
@@ -390,16 +400,38 @@ namespace FrenzelWPFApp
         {
             System.Diagnostics.Process.Start("explorer.exe", outputDirectory);
         }
+
+        private void TxtIdentityNumber_PreviewTextInput(object sender, TextCompositionEventArgs e)
+        {
+            if (!IsNumeric(e.Text))
+            {
+                e.Handled = true;
+            }
+            else
+            {
+                TextBox textBox = (TextBox)sender;
+                if (textBox.Text.Length >= 11)
+                {
+                    e.Handled = true;
+                }
+            }
+        }
+
+        private bool IsNumeric(string input)
+        {
+            return input.All(char.IsDigit);
+        }
+
+
+
         private void Window_Closed(object sender, EventArgs e)
         {
             Environment.Exit(0);
         }
-
         private void Window_Minimize(object sender, EventArgs e)
         {
             this.WindowState = WindowState.Minimized;
         }
-
         private void Window_Maximize(object sender, EventArgs e)
         {
             if(this.WindowState == WindowState.Maximized)

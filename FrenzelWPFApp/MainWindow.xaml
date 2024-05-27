@@ -30,14 +30,21 @@
                          HorizontalContentAlignment="Left"
                          Margin="10,5,5,5"
                          Style="{StaticResource ModernTextbox}"
-                         Tag="Kimlik No">
-
+                         Tag="Kimlik No"
+                         MaxLength="11"
+                         PreviewTextInput="TxtIdentityNumber_PreviewTextInput">
+            
                     </TextBox>
                     <Button Tag="Ara" 
                             Margin="-40,10,10,10"
                             Background="Gray"
                             Style="{StaticResource ModernButton}"
                             Click="SearchPatient_Click"></Button>
+                    <Button Tag="Sil" 
+                            Margin="-75,10,45,10"
+                            Background="Gray"
+                            Style="{StaticResource ModernButton}"
+                            Click="ClearPatient_Click"></Button>
                 </StackPanel>
                 <TextBox Name="txtFirstName" 
                          Width="200" Height="40"
